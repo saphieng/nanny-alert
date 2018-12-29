@@ -45,11 +45,11 @@ void setup() {
   pinMode(led_b,OUTPUT);
   //input setups
   pinMode(manual_btn, INPUT_PULLDOWN);
-  pinMode(a_btn, INPUT_PULLDOWN);
-  pinMode(b_btn, INPUT_PULLDOWN);
-  pinMode(c_btn, INPUT_PULLDOWN);
+  //pinMode(a_btn, INPUT_PULLDOWN);
+  //pinMode(b_btn, INPUT_PULLDOWN);
+  //pinMode(c_btn, INPUT_PULLDOWN);
   pinMode(d_btn, INPUT_PULLDOWN);
-  //pinMode(any_btn, INPUT);
+  //pinMode(any_btn, INPUT_PULLDOWN);
   setRGBColour(ORANGE);
 }
 
@@ -152,6 +152,5 @@ void controlRGB (bool red, bool green, bool blue){
 
 //Check if any of the buttons that trigger the an alert have been pressed
 bool checkAlertButtons (){
-  return digitalRead(manual_btn) || digitalRead(a_btn)
-          || digitalRead(b_btn) || digitalRead(c_btn) || digitalRead(d_btn);
+  return digitalRead(manual_btn) || digitalRead(d_btn);
 }
