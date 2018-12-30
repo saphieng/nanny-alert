@@ -1,12 +1,17 @@
 /*
  * Project nanny-alert
- * Description: Device that can be used to alert for help
+ * Description: Device that can be used to alert for help running on an electron
  * Author: Cameron Owen
  * Date: 29/12/18
  */
 #include "application.h"
+#include "Particle.h"
+#include <math.h>
 SYSTEM_MODE(SEMI_AUTOMATIC);
-// The Photon has 9 PWM pins: D0, D1, D2, D3, A4, A5, A7, RX and TX.
+// Electron Specific Setup
+// A FuelGauge named 'fuel' for checking on the battery state
+FuelGauge fuel;
+
 // Setup code for speaker
 int speakerPin = A4;
 //RGB Setup code
@@ -23,19 +28,28 @@ int led_b = D7;
 #define WHITE   5
 #define BLACK   6
 
+//System states
+#define CONNECTING 10
+#define ALERT 11
+#define CHARGING 12
+#define NORMAL 13
+
 //Remote Reciever IO
 int a_btn = D0;
 int b_btn = D1;
 int c_btn = D2;
 int d_btn = D3;
-int any_btn = D4;
+int aux_power = D4;
 int manual_btn = A0;
 long pressTime = 0;
 
 //Global variables
-bool connectionState = FALSE;
 bool prevAlertState = FALSE;
 bool  alertTriggered = FALSE;
+bool charging = TRUE;
+bool assistanceRequired = FALSE;
+int currentSystemState = NORMAL;
+bool blackout = FALSE;
 
 // setup() runs once, when the device is first turned on.
 void setup() {
@@ -49,21 +63,20 @@ void setup() {
   //pinMode(b_btn, INPUT_PULLDOWN);
   //pinMode(c_btn, INPUT_PULLDOWN);
   pinMode(d_btn, INPUT_PULLDOWN);
-  //pinMode(any_btn, INPUT_PULLDOWN);
+  pinMode(aux_power, INPUT_PULLDOWN);
   setRGBColour(ORANGE);
+  Particle.function("batt", batteryStatus);
 }
 
 // loop() runs over and over again, as quickly as it can execute.
 void loop() {
-  //Check we still have connection
-  if (!connectionState && Particle.connected()){
-    setRGBColour(GREEN);
-  }
+  //Check if particle is connected
   if (Particle.connected() == false) {
-    setRGBColour(ORANGE);
     Particle.connect();
-    //setRGBColour(GREEN);
   }
+
+  //Monitor if auxilary power is connected
+  charging = digitalRead(aux_power);
 
   //Monitor the button state
   alertTriggered = checkAlertButtons();
@@ -73,45 +86,69 @@ void loop() {
       alertTriggered = checkAlertButtons();
     }
     if (millis()-pressTime > 3000){
-      //If the D button is being held, fire a test message
-      if(digitalRead(d_btn)){
-        testAlert();
-      }
-      else{
-        resetAlarm();
-      }
+      resetAlarm();
     }
     else{
       sendForHelp();
     }
   }
-  connectionState = Particle.connected();
+
+  monitorSystemState();
   prevAlertState = alertTriggered;
   delay(100);
 }
 
+//Set The RGB based on the state of the SYSTEM
+void monitorSystemState (){
+  //Assitcance is required
+  if (assistanceRequired){
+    setRGBColour(RED);
+    currentSystemState = ALERT;
+  }
+  //Particle not connected
+  else if (Particle.connected() == false){
+    setRGBColour(ORANGE);
+    currentSystemState = CONNECTING;
+  }
+  //System is running on battery
+  else if (!charging){
+    setRGBColour(PURPLE);
+    if (!blackout){
+      blackout = TRUE;
+      Particle.publish("bo");
+    }
+    currentSystemState = CHARGING;
+  }
+  //System in normal state and running off power
+  else{
+    setRGBColour(GREEN);
+    if (blackout){
+      blackout = FALSE;
+      Particle.publish("pr");
+    }
+    currentSystemState = NORMAL;
+  }
+}
 //IFTTT functions for alerting
 void sendForHelp(){
-    setRGBColour(RED);
+    assistanceRequired = TRUE;
     tone(speakerPin,1000,1000);
-    Particle.publish("SendForHelp");
-    delay(1000);
+    Particle.publish("sfh");
 }
 
 void resetAlarm(){
+    assistanceRequired = FALSE;
     setRGBColour(BLUE);
     noTone(speakerPin);
-    Particle.publish("FalseAlarm");
+    Particle.publish("fa");
     delay(1000);
-    setRGBColour(GREEN);
 }
 
 void testAlert(){
     setRGBColour(ORANGE);
     tone(speakerPin,1000,1000);
-    Particle.publish("TestAlert");
+    Particle.publish("ta");
     delay(1000);
-    setRGBColour(GREEN);
 }
 
 //Set each individual RGB Colour
@@ -131,7 +168,7 @@ void setRGBColour (int colour){
       controlRGB(TRUE,TRUE,FALSE);
       break;
     case PURPLE:
-      controlRGB(FALSE,TRUE,TRUE);
+      controlRGB(TRUE,FALSE,TRUE);
       break;
     case WHITE:
       controlRGB(TRUE,TRUE,TRUE);
@@ -153,4 +190,23 @@ void controlRGB (bool red, bool green, bool blue){
 //Check if any of the buttons that trigger the an alert have been pressed
 bool checkAlertButtons (){
   return digitalRead(manual_btn) || digitalRead(d_btn);
+}
+
+// Lets you remotely check the battery status by calling the function "batt"
+// Triggers a publish with the info (so subscribe or watch the dashboard)
+// and also returns a '1' if there's >10% battery left and a '0' if below
+int batteryStatus(String command){
+    // Publish the battery voltage and percentage of battery remaining
+    // if you want to be really efficient, just report one of these
+    // the String::format("%f.2") part gives us a string to publish,
+    // but with only 2 decimal points to save space
+    Particle.publish("B",
+          "v:" + String::format("%.2f",fuel.getVCell()) +
+          ",c:" + String::format("%.2f",fuel.getSoC()),
+          60, PRIVATE
+    );
+    // if there's more than 10% of the battery left, then return 1
+    if (fuel.getSoC()>10){ return 1;}
+    // if you're running out of battery, return 0
+    else { return 0;}
 }
