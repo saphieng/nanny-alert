@@ -28,7 +28,7 @@ It was built with the following hardware
 - [Power Supply](https://core-electronics.com.au/12v-dc-2a-fixed-2-1mm-tip-appliance-plugpack.html)
 - [5V Regulator](https://core-electronics.com.au/pololu-5v-5a-step-down-voltage-regulator-d24v50f5.html?utm_source=google_shopping&gclid=CjwKCAiA9qHhBRB2EiwA7poaeCX29ZiiBZVHP_ZPJ9Gr2UQZnmFLVK69j8wON8hODQ4hBC6V8qIDIxoCTMsQAvD_BwE)
 
-**NOTE** The wirless relay link I used was because I already owned it and is actually overkill. If I was building this again I would probably go with this [Long Range Link] (https://core-electronics.com.au/2km-long-range-rf-link-kits-w-encoder-and-decoder-seeed-studio.html)
+**NOTE** The wirless relay link I used was because I already owned it and is actually overkill. If I was building this again I would probably go with this [Long Range Link](https://core-electronics.com.au/2km-long-range-rf-link-kits-w-encoder-and-decoder-seeed-studio.html)
 
 ## Video
 You can watch a demonstation of the system features here:
