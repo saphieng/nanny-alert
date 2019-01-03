@@ -1,31 +1,38 @@
 # nanny-alert
 
-A Particle project named nanny-alert
+This is the source code for an emergency alert system I built for Nan. It allows Nan to easily notify me if she needs assistance using a Particle Electron and a wireless remote for portability around the house.
 
-## Welcome to your project!
+## Features
+The system has the following features:
+- Alerts multiple people via email using SendGrid API webhook
+- RGB for easy status indication
+- Buzzer for audible feedback that alert has been sent
+- 3G mobile connection to avoid connection loss during blackout
+- LiPo backup and charging so the system stays online during power outage
+- Blackout detection that alerts if power outage is detected
+- Ability to monitor battery status using Particle Cloud API
+- Alert button built into box as well as remote for backup if remote fails
+- Press and hole to test system without sending alerts to all users
 
-Every new Particle project is composed of 3 important elements that you'll see have been created in your project directory for nanny-alert.
+## Hardware
+It was built with the following hardware
+- [Particle Electron](https://core-electronics.com.au/electron-3g-kit.html)
+- [Photon Battery Shield](https://core-electronics.com.au/sparkfun-photon-battery-shield.html)
+- [LiPo Rechargeable Battery](https://core-electronics.com.au/polymer-lithium-ion-battery-2000mah-38459.html)
+- [RGB LED](https://core-electronics.com.au/freetronics-8mm-rgb-led-common-cathode-8-pack-suitable-for-4x4x4-rgb-led-cube.html)
+- [Switch](https://core-electronics.com.au/spdt-mini-power-switch.html)
+- [Jiffy Box](https://www.jaycar.com.au/jiffy-case-imac-blue-ub5/p/HB6004)
+- [Buzzer](https://www.jaycar.com.au/mini-piezo-buzzer-3-16v/p/AB3462)
+- [Momentary](https://www.jaycar.com.au/red-miniature-pushbutton-spst-momentary-action-125v-1a-rating/p/SP0710)
+- [Wireless Relay Kit](https://au.element14.com/rf-solutions/hornet-s1m/remote-control-sys-fm-1-ch-230vac/dp/1753336) 
+- [Power Supply](https://core-electronics.com.au/12v-dc-2a-fixed-2-1mm-tip-appliance-plugpack.html)
+- [5V Regulator](https://core-electronics.com.au/pololu-5v-5a-step-down-voltage-regulator-d24v50f5.html?utm_source=google_shopping&gclid=CjwKCAiA9qHhBRB2EiwA7poaeCX29ZiiBZVHP_ZPJ9Gr2UQZnmFLVK69j8wON8hODQ4hBC6V8qIDIxoCTMsQAvD_BwE)
 
-#### ```/src``` folder:  
-This is the source folder that contains the firmware files for your project. It should *not* be renamed. 
-Anything that is in this folder when you compile your project will be sent to our compile service and compiled into a firmware binary for the Particle device that you have targeted.
+**NOTE** The wirless relay link I used was because I already owned it and is actually overkill. If I was building this again I would probably go with this [Long Range Link](https://core-electronics.com.au/2km-long-range-rf-link-kits-w-encoder-and-decoder-seeed-studio.html)
 
-If your application contains multiple files, they should all be included in the `src` folder. If your firmware depends on Particle libraries, those dependencies are specified in the `project.properties` file referenced below.
-
-#### ```.ino``` file:
-This file is the firmware that will run as the primary application on your Particle device. It contains a `setup()` and `loop()` function, and can be written in Wiring or C/C++. For more information about using the Particle firmware API to create firmware for your Particle device, refer to the [Firmware Reference](https://docs.particle.io/reference/firmware/) section of the Particle documentation.
-
-#### ```project.properties``` file:  
-This is the file that specifies the name and version number of the libraries that your project depends on. Dependencies are added automatically to your `project.properties` file when you add a library to a project using the `particle library add` command in the CLI or add a library in the Desktop IDE.
-
-## Adding additional files to your project
-
-#### Projects with multiple sources
-If you would like add additional files to your application, they should be added to the `/src` folder. All files in the `/src` folder will be sent to the Particle Cloud to produce a compiled binary.
-
-#### Projects with external libraries
-If your project includes a library that has not been registered in the Particle libraries system, you should create a new folder named `/lib/<libraryname>/src` under `/<project dir>` and add the `.h`, `.cpp` & `library.properties` files for your library there. Read the [Firmware Libraries guide](https://docs.particle.io/guide/tools-and-features/libraries/) for more details on how to develop libraries. Note that all contents of the `/lib` folder and subfolders will also be sent to the Cloud for compilation.
-
+## Video
+You can watch a demonstation of the system features here:
+[Nanny Alert Video](https://saphi-my.sharepoint.com/:v:/g/personal/cameron_owen_saphi_com_au/EacVCGm-2VhGmgQSDRwlahcBsEhJkdWTj02UrcF2tH0-ZQ?e=yKbDGY)
 ## Compiling your project
 
 When you're ready to compile your project, make sure you have the correct Particle device target selected and run `particle compile <platform>` in the CLI or click the Compile button in the Desktop IDE. The following files in your project folder will be sent to the compile service:
