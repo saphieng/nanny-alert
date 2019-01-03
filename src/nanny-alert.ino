@@ -115,7 +115,7 @@ void monitorSystemState (){
     setRGBColour(PURPLE);
     if (!blackout){
       blackout = TRUE;
-      Particle.publish("bo");
+      Particle.publish("bo", PRIVATE);
     }
     currentSystemState = CHARGING;
   }
@@ -124,7 +124,7 @@ void monitorSystemState (){
     setRGBColour(GREEN);
     if (blackout){
       blackout = FALSE;
-      Particle.publish("pr");
+      Particle.publish("pr", PRIVATE);
     }
     currentSystemState = NORMAL;
   }
@@ -133,21 +133,21 @@ void monitorSystemState (){
 void sendForHelp(){
     assistanceRequired = TRUE;
     tone(speakerPin,1000,1000);
-    Particle.publish("sfh");
+    Particle.publish("sfh", PRIVATE);
 }
 
 void resetAlarm(){
     assistanceRequired = FALSE;
     setRGBColour(BLUE);
     noTone(speakerPin);
-    Particle.publish("fa");
+    Particle.publish("fa", PRIVATE);
     delay(1000);
 }
 
 void testAlert(){
     setRGBColour(ORANGE);
     tone(speakerPin,1000,1000);
-    Particle.publish("ta");
+    Particle.publish("ta", PRIVATE);
     delay(1000);
 }
 
