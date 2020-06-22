@@ -66,6 +66,7 @@ void setup() {
   pinMode(aux_power, INPUT_PULLDOWN);
   setRGBColour(ORANGE);
   Particle.function("batt", batteryStatus);
+  Particle.function("test-alert", TestAlert);
 }
 
 // loop() runs over and over again, as quickly as it can execute.
@@ -134,6 +135,7 @@ void sendForHelp(){
     assistanceRequired = TRUE;
     tone(speakerPin,1000,1000);
     Particle.publish("sfh", PRIVATE);
+    Particle.publish("sms-sfh", PRIVATE);
 }
 
 void resetAlarm(){
@@ -141,6 +143,7 @@ void resetAlarm(){
     setRGBColour(BLUE);
     noTone(speakerPin);
     Particle.publish("fa", PRIVATE);
+    Particle.publish("sms-fa", PRIVATE);
     delay(1000);
 }
 
@@ -209,4 +212,17 @@ int batteryStatus(String command){
     if (fuel.getSoC()>10){ return 1;}
     // if you're running out of battery, return 0
     else { return 0;}
+}
+
+int TestAlert(String command){
+    // Publish the battery voltage and percentage of battery remaining
+    // if you want to be really efficient, just report one of these
+    // the String::format("%f.2") part gives us a string to publish,
+    // but with only 2 decimal points to save space
+    Particle.publish("TA",
+          "Sending test text message",
+          60, PRIVATE
+    );
+    Particle.publish("sms-sfh", PRIVATE);
+    return 1;
 }
