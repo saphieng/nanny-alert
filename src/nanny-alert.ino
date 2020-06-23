@@ -18,6 +18,10 @@ int speakerPin = A4;
 int led_r = D5;
 int led_g = D6;
 int led_b = D7;
+//Telstra API Token
+String token = "";
+//Hour for triggering api token
+static int lastHour = 25;
 
 //RDB colour definitions
 #define RED  0
@@ -66,7 +70,8 @@ void setup() {
   pinMode(aux_power, INPUT_PULLDOWN);
   setRGBColour(ORANGE);
   Particle.function("batt", batteryStatus);
-  Particle.function("test-alert", TestAlert);
+  Particle.function("test-sms", TestAlert);
+  Particle.subscribe("hook-response/sms-gt", parseToken, MY_DEVICES);
 }
 
 // loop() runs over and over again, as quickly as it can execute.
@@ -96,6 +101,16 @@ void loop() {
 
   monitorSystemState();
   prevAlertState = alertTriggered;
+
+  //Check if API token has expired every hour
+  int currentHour = Time.hour();
+  if(lastHour != currentHour && Particle.connected())
+  {
+    //Get updated api token
+     Particle.publish("sms-gt", PRIVATE);
+     lastHour = currentHour;
+  }
+  
   delay(100);
 }
 
@@ -135,7 +150,7 @@ void sendForHelp(){
     assistanceRequired = TRUE;
     tone(speakerPin,1000,1000);
     Particle.publish("sfh", PRIVATE);
-    Particle.publish("sms-sfh", PRIVATE);
+    Particle.publish("sms-sfh", token, PRIVATE);
 }
 
 void resetAlarm(){
@@ -143,7 +158,7 @@ void resetAlarm(){
     setRGBColour(BLUE);
     noTone(speakerPin);
     Particle.publish("fa", PRIVATE);
-    Particle.publish("sms-fa", PRIVATE);
+    Particle.publish("sms-fa", token, PRIVATE);
     delay(1000);
 }
 
@@ -151,6 +166,7 @@ void testAlert(){
     setRGBColour(ORANGE);
     tone(speakerPin,1000,1000);
     Particle.publish("ta", PRIVATE);
+    Particle.publish("sms-ta", token, PRIVATE);
     delay(1000);
 }
 
@@ -220,9 +236,41 @@ int TestAlert(String command){
     // the String::format("%f.2") part gives us a string to publish,
     // but with only 2 decimal points to save space
     Particle.publish("TA",
-          "Sending test text message",
+          "sms-tk: " + token,
           60, PRIVATE
     );
-    Particle.publish("sms-sfh", PRIVATE);
+    Particle.publish("sms-ta", token, PRIVATE);
     return 1;
 }
+
+void parseToken(const char *event, const char *data) {
+  String TokenString = String(data);
+  token = tryExtractString(TokenString, "\"access_token\":\"","\",\"token_type");
+  Particle.publish("tk",
+      "token:"+ token,
+      60, PRIVATE
+  );
+  // Handle the integration response
+}
+
+//Extract specifi part of string
+String tryExtractString(String str, const char* start, const char* end)
+{
+    if (str == NULL) {
+        return "";
+    }
+
+    int idx = str.indexOf(start);
+    if (idx < 0) {
+        return "";
+    }
+
+    int endIdx = str.indexOf(end);
+    if (endIdx < 0) {
+        return "";
+    }
+
+    return str.substring(idx + strlen(start), endIdx);
+}
+          
+
