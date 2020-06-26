@@ -109,6 +109,10 @@ void loop() {
     //Get updated api token
      Particle.publish("sms-gt", PRIVATE);
      lastHour = currentHour;
+     //At midday everyday send a test message so we know the system is running
+     if (lastHour == 12) {
+       Particle.publish("sms-ta", token, PRIVATE);
+     }
   }
   
   delay(100);
