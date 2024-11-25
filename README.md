@@ -32,7 +32,7 @@ It was built with the following hardware
 
 ## Video
 You can watch a demonstation of the system features here:
-[Nanny Alert Video](https://saphi-my.sharepoint.com/:v:/g/personal/cameron_owen_saphi_com_au/EacVCGm-2VhGmgQSDRwlahcBsEhJkdWTj02UrcF2tH0-ZQ?e=yKbDGY)
+[Nanny Alert Video](https://saphi-my.sharepoint.com/personal/cameron_saphi_engineering/_layouts/15/stream.aspx?id=%2Fpersonal%2Fcameron%5Fsaphi%5Fengineering%2FDocuments%2FArchived%2FVideos%2FNanny%20Alert%2EMOV&ga=1&referrer=StreamWebApp%2EWeb&referrerScenario=AddressBarCopied%2Eview%2Ea87907aa%2D85bc%2D47a4%2Da2da%2D0f3a6857869e)
 ## Compiling your project
 
 When you're ready to compile your project, make sure you have the correct Particle device target selected and run `particle compile <platform>` in the CLI or click the Compile button in the Desktop IDE. The following files in your project folder will be sent to the compile service:
